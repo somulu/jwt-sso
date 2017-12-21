@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>SSLSignature SSO IFRAME</title>
+		<script
+		  src="https://code.jquery.com/jquery-3.2.1.min.js"
+		  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+		  crossorigin="anonymous"></script>
+		<script>
+			//GET your params from sslssso.js config or generate this page dynamically on server
+
+			var accountId = getGetParam("accountId");
+			var domain = getGetParam("domain");
+			var validationUrl = getGetParam("validationUrl");
+			var validate = !(getGetParam("validate") == 'false');
+			if (validate && !validationUrl)
+				validationUrl = getOrigin() + '/validate';
+
+			var config = {
+				validationUrl: validationUrl,
+                accountId: accountId,
+                apiKey: '',
+                domain: domain,
+                tokenId: 'ssls.sso.jwt.' + accountId,
+                validate: validate
+			}
+			init(config);
+
+		</script>
+	</head>
+</html>
