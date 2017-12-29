@@ -1,4 +1,4 @@
-import { log, getOrigin, getGetParam, JWT, LogLevels } from './sso_common.js'
+import { getOrigin, getGetParam, JWT } from './sso_common.js'
 import { RestClient } from './sso_rest.js'
 
 var validationUrl;
@@ -6,45 +6,38 @@ var validate;
 var accountId;
 var tokenId;
 var apiKey;
+var domain;
 
 // Public functions
 function onIdentification(operation){
-  log(LogLevels.INFO ,"[SSO IFRAME] fire event onidentification jwt: "+ operation.jwt);
-
   //var domain = getGetParam2("domain");
   //if (!domain || domain=="")
-    domain = "*";
+  domain = "*";
 
   postMessageToListeners (operation,domain);
 }
 
 // Private functions
 function onLogout(){
-  log(LogLevels.INFO ,"[SSO IFRAME] fire event onlogout ");
 
   //var domain = getGetParam2("domain");
   //if (!domain || domain=="")
   domain = "*";
-  log(LogLevels.DEBUG,"[SSO IFRAME] postMessage to: "+ domain);
   var operation = {action:"sso.onlogout"};
 
   postMessageToListeners (operation,domain);
 }
 
 function onLoad(){
-  log(LogLevels.INFO ,"[SSO IFRAME] fire event onload ");
-
   //var domain = getGetParam2("domain");
   //if (!domain || domain=="")
-    domain = "*";
-  log(LogLevels.DEBUG,"[SSO IFRAME] postMessage to: "+ domain);
+  domain = "*";
   var operation = {action:"sso.onload"};
 
   postMessageToListeners (operation,domain);
 }
 
 function postMessageToListeners (operation, domain){
-  log(LogLevels.DEBUG,"[SSO IFRAME] postMessage "+operation.action+" to: "+ domain);
   if (window.attachEvent) {   // IE before version 9
     window.parent.postMessage(JSON.stringify(operation), domain);
   } else {
@@ -55,14 +48,11 @@ function postMessageToListeners (operation, domain){
 
 
 function doLogout(){
-  log(LogLevels.INFO,"[SSO IFRAME] logout ");
   localStorage.removeItem(tokenId);
-
   onLogout();
 }
 
 function doLogin(jwt){
-  log(LogLevels.INFO,"[SSO IFRAME] login :"+jwt);
   localStorage.setItem(tokenId,jwt);
   /*if (isIE()){
     //Mas mierda de IE. En el caso de IE11 no sincroniza entre pestañas si no haces esta guarrería. Y tampoco va
@@ -72,19 +62,14 @@ function doLogin(jwt){
 }
 
 function localStorageHandler(e) {
-
-    log(LogLevels.DEBUG,'[SSO IFRAME] Successfully communicate with other tab');
-    log(LogLevels.DEBUG,'[SSO IFRAME] Received data: ' + localStorage.getItem(tokenId));
-    var jwtsso = localStorage.getItem(tokenId);
-    if (jwtsso){
-    validateJWT (jwtsso);
+  var jwtsso = localStorage.getItem(tokenId);
+  if (jwtsso){
+    validateJWT(jwtsso);
   } else {
     onLogout();
   }
 }
 function localStorageHandlerIE8(e) {
-    log(LogLevels.DEBUG,'[SSO IFRAME] Successfully communicate with other tab IE8');
-
   // var jwtsso = localStorage.getItem(tokenId); ->  old value in IE
   // timeout waiting IE8 browser to update the new value
   setTimeout(function(){
@@ -102,16 +87,13 @@ function listener(event){
   //if ( event.origin !== "https://pfb.sslsignature.com" ){
   //  return;
   //}
-  log(LogLevels.DEBUG,"[SSO IFRAME] received event ");
-
   var data = event.data; //Chrome, firefox, IE11 , etc
-  if (event.data && !event.data.action){ //<=IE8 & IE9 porque no soporta JSON en objetos de mensaje
-    data  =  eval('(' + event.data+ ')');
-  }
+  // if (event.data && !event.data.action){ //<=IE8 & IE9 porque no soporta JSON en objetos de mensaje
+  //   data  =  eval('(' + event.data+ ')');
+  // }
 
 
   if(data.hasOwnProperty('action')) {
-    log(LogLevels.DEBUG,"[SSO IFRAME] received event "+data.action);
     var action = data.action;
     if (action == 'logout'){
       doLogout();
@@ -120,8 +102,6 @@ function listener(event){
         doLogin(data.jwt);
       }
     }
-  } else {
-    log(LogLevels.WARN,"[SSO IFRAME] received unknown event ");
   }
 
 }
@@ -132,17 +112,14 @@ function validateJWT(jwtsso){
     //Invoke server to get remote validation of token signature, parse and return extra data if necessary
     validateJWTRemote(jwtsso);
   } else {
-    //Do not validate. Expected token validation on first usage of jwt
+    // Do not validate. Expected token validation on first usage of jwt
     parseJWTLocal(jwtsso);
   }
 
 }
 
 function validateJWTRemote(jwtsso){
-  log(LogLevels.DEBUG,"[SSO IFRAME] Remote validation of JWT with url: "+validationUrl+ " accountId:"+ accountId+ " apiKey:"+apiKey);
-
-  jwt = new JWT(jwtsso);
-  log(LogLevels.DEBUG,jwt.payload());
+  var jwt = new JWT(jwtsso);
   var rest = new RestClient(validationUrl,accountId,apiKey);
 
   /*
@@ -158,12 +135,8 @@ function validateJWTRemote(jwtsso){
       if (obj.AuthenticationOperation){
         operation = obj.AuthenticationOperation;
       }
-      log(LogLevels.DEBUG,"[SSO IFRAME] Validating token "+operation.status);
-
       if (operation.status == 'SUCCESS') {
-        log(LogLevels.INFO,"[SSO IFRAME] token is valid ");
         if (operation.jwt && operation.jwt != jwtsso){
-          log(LogLevels.INFO,"[SSO IFRAME] Backend issued a new JWT. Replace current token");
           doLogin(operation.jwt);
         } else  {
           operation.jwt = jwtsso;
@@ -176,24 +149,21 @@ function validateJWTRemote(jwtsso){
 
       } else {
         localStorage.removeItem(tokenId);
-        log(LogLevels.ERROR,"[SSO IFRAME] invalid token: "+operation.error);
       }
       //Authentication process finish. //fire onload event
       onLoad();
-    },
-    function(err) {
-    log(LogLevels.DEBUG,err);
     });
+    // ,
+    // function(err) {
+    //   console.log(LogLevels.DEBUG,err);
+    // });
 
 }
 
 function parseJWTLocal(jwtsso){
-  log(LogLevels.INFO,"[SSO IFRAME] Local parse of JWT (no signature validation)");
   try{
     var jwt = new JWT(jwtsso);
     var payload = jwt.payload();
-    log(LogLevels.DEBUG,payload);
-
     if (jwt.isExpired())
       throw ("JWT expired");
 
@@ -208,7 +178,6 @@ function parseJWTLocal(jwtsso){
   } catch (err){
     //Bad token. remove it
     localStorage.removeItem(tokenId);
-    log(LogLevels.ERROR,"[SSO IFRAME] invalid token: "+err);
   }
   //Authentication process finish. //fire onload event
   onLoad();
@@ -216,8 +185,6 @@ function parseJWTLocal(jwtsso){
 
 function ready(){
   var jwtsso = localStorage.getItem(tokenId);
-  log(LogLevels.INFO,"[SSO IFRAME] ready");
-  log(LogLevels.DEBUG,"[SSO IFRAME] " + tokenId + " = "+jwtsso);
   if (jwtsso){
     validateJWT (jwtsso);
   } else {
@@ -226,12 +193,11 @@ function ready(){
   }
 }
 
-function init(config){
-
-  var accountId = getGetParam("accountId");
-  var domain = getGetParam("domain");
-  var validationUrl = getGetParam("validationUrl");
-  var validate = !(getGetParam("validate") == 'false');
+function init(){
+  accountId = getGetParam("accountId");
+  domain = getGetParam("domain");
+  validationUrl = getGetParam("validationUrl");
+  validate = !(getGetParam("validate") == 'false');
   if (validate && !validationUrl)
     validationUrl = getOrigin() + '/validate';
 
@@ -277,7 +243,6 @@ function init(config){
   accountId = config.accountId;
   tokenId = config.tokenId;
   apiKey = config.apiKey;
-  log(LogLevels.INFO,"[SSO IFRAME] inited");
 }
 
 module.exports = {

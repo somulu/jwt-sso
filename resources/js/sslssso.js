@@ -1,9 +1,6 @@
 import sso_html from '../html/sso.html';
-require('./sso_common.js');
-require('./sso_rest.js');
-require('./sso.js');
 
-var console = window.console || { log: function() {} };
+// var console = window.console || { log: function() {} };
 
 function Observable(){
 
@@ -45,7 +42,6 @@ function Observable(){
 
 function sslssso (){
 	//"use strict";
-
 
     var DEFAULT_IFRAME_URI = sso_html;
 
@@ -177,7 +173,6 @@ function sslssso (){
 
     function postSSOMessage(message,domain){
     	var win = document.getElementById("ssls.sso.iframe").contentWindow;
-    	console.log("[SSLS SSO] postMessage "+message.action+" to "+_getUrl());
     	if (window.attachEvent) {   // IE before version 9
 			//TODO No acaba de funcionar en ie8
   			win.postMessage(JSON.stringify(message), "*");
@@ -187,12 +182,10 @@ function sslssso (){
     }
 
     function dispatchEvent(eventName, detail){
-    	console.log ("[SSLS SSO] dispatchEvent "+eventName);
     	obs.fireEvent(eventName, detail);
     }
 
 	function _listener(event){
-
 		if (  _getUrl().lastIndexOf(event.origin ) == -1){
 			return;
 		}
@@ -204,18 +197,15 @@ function sslssso (){
 
 
 		if (data && data .action == "sso.onlogout"){
-			console.log("[SSLS SSO] received event onlogout");
 			if (typeof(onLogout) == "function")
 				onLogout();
 			dispatchEvent('sso.onlogout');
 		} else if (data && data.action == "sso.onload") {
-			console.log("[SSLS SSO] received event onload ");
 			if (typeof(onLoad) == "function")
 				onLoad();
 			dispatchEvent('sso.onload');
 
 		}else if (data && data.action == "sso.onidentification") {
-			console.log("[SSLS SSO] received event onidentification ");
 			if (typeof(onIdentification) == "function")
 				onIdentification(data);
 			dispatchEvent('sso.onidentification',data);
@@ -228,19 +218,17 @@ function sslssso (){
 
 
 		var accountId = _getAccountId();
-		console.log ("[SSLS SSO] accountId = "+accountId + " SSOServerUrl= " +_getUrl());
 
 		//Message listener for SSO events (created by the SSO iframe)
 		if (window.addEventListener){
 			addEventListener("message", _listener, false)
-		} else {
-			attachEvent("onmessage", _listener)
-		}
+    } else {
+      attachEvent("onmessage", _listener)
+    }
 
 		//Creates the iframe with reference to server SSO functions
 		var iframeUrl = _getIframeUrl()
-		console.log ("[SSLS SSO] create iframe: "+ iframeUrl);
-	    var iframe = document.createElement('iframe');
+	  var iframe = document.createElement('iframe');
 		iframe.style.display = "none";
 		iframe.src = iframeUrl;
 		iframe.id = 'ssls.sso.iframe';

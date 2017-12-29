@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --config webpack.config.js"
+    "build": "webpack --config webpack.config.js",
+    "start": "webpack-dev-server --open"
   },
   "author": "Aditya Narsapurkar",
   "license": "ISC",
@@ -15,6 +16,7 @@
     "babel-preset-env": "^1.6.1",
     "file-loader": "^1.1.6",
     "uglifyjs-webpack-plugin": "^1.1.4",
-    "webpack": "^3.10.0"
+    "webpack": "^3.10.0",
+    "webpack-dev-server": "^2.9.7"
   }
 }

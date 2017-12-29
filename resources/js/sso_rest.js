@@ -1,4 +1,4 @@
-import { log, LogLevels, Base64 } from './sso_common.js'
+import { Base64 } from './sso_common.js'
 
 function RestClient (host,accountId,apiKey,scheme){
 	"use strict";
@@ -41,9 +41,6 @@ function RestClient (host,accountId,apiKey,scheme){
 
 	function _get(url,fulfill,reject){
 			var contentType = "application/json; charset=utf-8";
-
-			log(LogLevels.INFO, "GET "+url+ " "+contentType);
-
 			$.support.cors = true;
 			$.ajax({
 				type: "GET", //GET or POST or PUT or DELETE verb
@@ -73,10 +70,6 @@ function RestClient (host,accountId,apiKey,scheme){
 			var jsondata = null;
 			if (request)
 				jsondata = JSON.stringify(request, null, 4);
-
-			log(LogLevels.INFO, "POST "+url+ " "+contentType);
-			log(LogLevels.DEBUG, "  Request: "+jsondata);
-
 			$.support.cors = true;
 			$.ajax({
 				type: "POST", //GET or POST or PUT or DELETE verb
@@ -106,10 +99,6 @@ function RestClient (host,accountId,apiKey,scheme){
 			var jsondata = null;
 			if (request)
 				jsondata = JSON.stringify(request, null, 4);
-
-			log(LogLevels.INFO, "POST "+url+ " "+contentType);
-			log(LogLevels.DEBUG, "  Request: "+jsondata);
-
 			$.support.cors = true;
 			$.ajax({
 				type: "POST", //GET or POST or PUT or DELETE verb
@@ -138,9 +127,6 @@ function RestClient (host,accountId,apiKey,scheme){
 			if (request)
 				jsondata = JSON.stringify(request, null, 4);
 
-			log(LogLevels.INFO, "POST "+url+ " "+contentType);
-			log(LogLevels.DEBUG, "  Request: "+jsondata);
-
 			_ajax.post(
 					url,
 					request,
@@ -154,8 +140,6 @@ function RestClient (host,accountId,apiKey,scheme){
 
 			var contentType = "application/json; charset=utf-8";
 			var jsondata = null;
-
-			log(LogLevels.INFO, "DELETE "+url+ " "+contentType);
 
 			$.support.cors = true;
 			$.ajax({
@@ -188,9 +172,6 @@ function RestClient (host,accountId,apiKey,scheme){
 
 			var contentType = "application/octet-stream";
 
-			log(LogLevels.INFO, "POST "+url+ " "+contentType);
-			log(LogLevels.DEBUG, data);
-
 			if (!_isAbv(data) &&  !_isAb(data))
 				throw "data is not an ArrayBuffer";
 
@@ -219,11 +200,9 @@ function RestClient (host,accountId,apiKey,scheme){
 			var jsonresponse = response;
 			if (typeof response === 'object')
 				jsonresponse = JSON.stringify(response, null, 4);
-			log(LogLevels.DEBUG, "  Response: "+jsonresponse);
 			var obj = JSON.parse( jsonresponse );
 			return obj;
 		}else {
-			log(LogLevels.DEBUG, "  Response: NULL");
 			return;
 		}
 	}
