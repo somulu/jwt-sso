@@ -9,7 +9,7 @@ module.exports = [
     filename: 'ssoIframe.js',
     path: path.resolve(__dirname, 'dist'),
     library: 'ssoIframe',
-    libraryTarget: 'var'
+    libraryTarget: 'umd'
   },
   module: {
     rules: [
@@ -41,7 +41,7 @@ module.exports = [
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     library: 'sslssso',
-    libraryTarget: 'var'
+    libraryTarget: 'umd'
   },
   module: {
     rules: [

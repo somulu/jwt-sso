@@ -1,15 +1,16 @@
 {
   "name": "ssojs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Javascript package for Single Sign On",
-  "main": "index.js",
+  "main": "dist/bundle.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config webpack.config.js",
     "start": "webpack-dev-server --open"
   },
   "author": "Aditya Narsapurkar",
-  "license": "ISC",
+  "license": "MIT",
+  "repository": "github:aditya-vector/sso-jwt-js",
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
