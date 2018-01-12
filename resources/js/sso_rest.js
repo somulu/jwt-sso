@@ -1,4 +1,5 @@
-import { Base64 } from './sso_common.js'
+import $ from 'jquery';
+import { Base64 } from './sso_common.js';
 
 function RestClient (host,accountId,apiKey,scheme){
 	"use strict";
