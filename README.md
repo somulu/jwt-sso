@@ -32,7 +32,7 @@ Cross Domain Single Sign On with the help of Json Web Tokens (JWT)
     - `onLoad` : Called after the SSO JS is loaded and events listners are assigned
     - `onIdentification`: Called after logging in from Provider or after validation completes for already logged in session
     - `onLogout`: Called after `sslssso.logout` function is called and existing token is removed from browser
-  
+
   - **Steps to implement** (Common for consumer and provider applications unless specified otherwise):
     - Provide meta tags (listed above)
     - Load the javascript on client (browser). It will expose `sslssso` object containing following login and logout functions,
@@ -40,7 +40,11 @@ Cross Domain Single Sign On with the help of Json Web Tokens (JWT)
       - `sslssso.logout()`
     - Create an endpoint for the validation url on the server (must for Provider, optional for Consumer),
       - Eg: `yourdomain.com/validate` (The sso js makes an ajax (xhr) request. The endpoint should be able to serve xhr requests with json data)
-      - Expected response parameters upon sucessful authentication: `{SUCCESS: true, auth_token: "your jwt token"}`
+      - Expected response parameters upon sucessful authentication: `{
+        'status' => 'SUCCESS',
+        'sub' => 'your user id',
+        'eidentifier' => 'your user email'
+      }`
     - **FOR PROVIDER**
       - Logging in with credentials:
         - Authenticate with user credentials and get the (JWT) token
