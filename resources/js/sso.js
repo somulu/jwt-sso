@@ -37,6 +37,12 @@ function onLoad(){
   postMessageToListeners (operation,domain);
 }
 
+function noAuthFound(){
+  domain = "*";
+  var operation = {action: "sso.noauthfound"};
+  postMessageToListeners (operation,domain);
+}
+
 function postMessageToListeners (operation, domain){
   if (window.attachEvent) {   // IE before version 9
     window.parent.postMessage(JSON.stringify(operation), domain);
@@ -188,6 +194,7 @@ function ready(){
   if (jwtsso){
     validateJWT (jwtsso);
   } else {
+    noAuthFound()
     //OnLoad must be the last method invocation. Invoked head or from validateJWT after token validation
     onLoad();
   }
