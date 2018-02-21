@@ -209,7 +209,12 @@ function sslssso (){
 			if (typeof(onIdentification) == "function")
 				onIdentification(data);
 			dispatchEvent('sso.onidentification',data);
-		}
+
+		}else if (data && data.action == "sso.noauthfound") {
+      if (typeof(noAuthFound) == "function")
+        noAuthFound(data);
+      dispatchEvent('sso.noauthfound',data);
+    }
 	}
 
 
