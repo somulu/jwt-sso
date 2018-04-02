@@ -154,7 +154,7 @@ function validateJWTRemote(jwtsso){
         onIdentification(operation);
 
       } else {
-        localStorage.removeItem(tokenId);
+        doLogout();
       }
       //Authentication process finish. //fire onload event
       onLoad();

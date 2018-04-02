@@ -12,11 +12,11 @@ function RestClient (host,accountId,apiKey,scheme){
 
 
 
-	this.validateJWT = function (jwt,fulfill,reject){
+	this.validateJWT = function (jwt, fulfill){
 		//var uri = host+'/sso/' + accountId + '/jwt';
 		var uri = host;
 		var request = {jwt: jwt};
-		return _post(uri,request,fulfill,reject);
+		return _post(uri, request, fulfill);
 	};
 
 	function _validateScheme(scheme){
@@ -65,7 +65,7 @@ function RestClient (host,accountId,apiKey,scheme){
 		return "Bearer " + token
 	}
 
-	function _post(url, request,fulfill,reject){
+	function _post(url, request, fulfill){
 
 			var contentType = "application/json; charset=utf-8";
 			var jsondata = null;
@@ -87,7 +87,7 @@ function RestClient (host,accountId,apiKey,scheme){
 				response = _decodeJson(response);
 				fulfill(response);
 			}).fail(function (err)	{
-				reject(err);
+				fulfill(err);
 			});
 
 
