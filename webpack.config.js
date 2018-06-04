@@ -30,9 +30,9 @@ module.exports = [
   //   contentBase: './dist'
   // }
   // ,
-  plugins: [
-    new UglifyJsPlugin()
-  ]
+  // plugins: [
+  //   new UglifyJsPlugin()
+  // ]
 },
 {
   name: 'ssoPub',
@@ -69,8 +69,8 @@ module.exports = [
   //   contentBase: './dist'
   // }
   // ,
-  plugins: [
-    new UglifyJsPlugin()
-  ]
+  // plugins: [
+  //   new UglifyJsPlugin()
+  // ]
 }
 ];
