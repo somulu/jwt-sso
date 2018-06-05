@@ -1,4 +1,4 @@
-import { getOrigin, getGetParam, JWT } from './sso_common.js'
+import { getOrigin, getGetParam, JWT, getCookieByName, setPersistentCookie, deleteCookieByName, isSafariBrowser } from './sso_common.js'
 import { RestClient } from './sso_rest.js'
 
 var validationUrl;
@@ -7,6 +7,7 @@ var accountId;
 var tokenId;
 var apiKey;
 var domain;
+var safariCookie = '__c2FmYXJpVmVyaWZpY2F0aW9uVG9rZW4';
 
 // Public functions
 function onIdentification(operation){
@@ -55,11 +56,17 @@ function postMessageToListeners (operation, domain){
 
 function doLogout(){
   localStorage.removeItem(tokenId);
+  if(isSafariBrowser()) {
+    deleteCookieByName(safariCookie);
+  }
   onLogout();
 }
 
 function doLogin(jwt){
   localStorage.setItem(tokenId,jwt);
+  if(isSafariBrowser()) {
+    setPersistentCookie(safariCookie, jwt);
+  }
   /*if (isIE()){
     //Mas mierda de IE. En el caso de IE11 no sincroniza entre pestañas si no haces esta guarrería. Y tampoco va
     localStorage.setItem('dummy', 'dummyvalue');
@@ -183,14 +190,19 @@ function parseJWTLocal(jwtsso){
 
   } catch (err){
     //Bad token. remove it
-    localStorage.removeItem(tokenId);
+    doLogout();
   }
   //Authentication process finish. //fire onload event
   onLoad();
 }
 
 function ready(){
-  var jwtsso = localStorage.getItem(tokenId);
+  // Explicit cookie implementation for safari because localStorage is not accessible from remote iFrame but cookies are
+  if (isSafariBrowser()) {
+    var jwtsso = getCookieByName(safariCookie);
+  } else {
+    var jwtsso = localStorage.getItem(tokenId);
+  }
   if (jwtsso){
     validateJWT (jwtsso);
   } else {

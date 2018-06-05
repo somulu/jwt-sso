@@ -33,6 +33,38 @@ function getGetParam (vr){
     }
 };
 
+function getCookieByName(name) {
+  var parts, value;
+  value = '; ' + document.cookie;
+  parts = value.split('; ' + name + '=');
+  if (parts.length === 2) {
+    return parts.pop().split(';').shift();
+  }
+}
+
+function setPersistentCookie(name, value) {
+  // Build the expiration date string:
+  var expiration_date = new Date();
+  var cookie_string = '';
+  expiration_date.setFullYear(expiration_date.getFullYear() + 5);
+  // Build the set-cookie string:
+  cookie_string = name + '=' + value + "; path=/; expires=" + expiration_date.toUTCString();
+  // Create or update the cookie:
+  document.cookie = cookie_string;
+}
+
+function deleteCookieByName(name) {
+  document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+
+function isSafariBrowser() {
+  var is_safari = navigator.userAgent.indexOf("Safari") > -1;
+  // Chrome has Safari in the user agent so we need to filter (https://stackoverflow.com/a/7768006/1502448)
+  var is_chrome = navigator.userAgent.indexOf("Chrome") > -1;
+  if ((is_chrome) && (is_safari)) {is_safari = false;}
+  return is_safari;
+}
+
 
 function JWT (jwt){
 	"use strict";
@@ -88,5 +120,9 @@ module.exports = {
 	getOrigin: getOrigin,
 	getGetParam: getGetParam,
 	JWT: JWT,
-	Base64: Base64
+	Base64: Base64,
+  setPersistentCookie: setPersistentCookie,
+	getCookieByName: getCookieByName,
+  deleteCookieByName: deleteCookieByName,
+	isSafariBrowser: isSafariBrowser
 }
