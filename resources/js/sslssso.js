@@ -237,7 +237,13 @@ function sslssso (){
 		iframe.style.display = "none";
 		iframe.src = iframeUrl;
 		iframe.id = 'ssls.sso.iframe';
-		document.body.appendChild(iframe);
+    // For Compatibility with turbolinks Rails
+    // Issue: Turbolinks loads only replaces body of the html page being loaded.
+    // Thus we need a way to make sure we have one element which we can tell turbolinks not to reload
+    // `footerWrap` is the element which should be kept permanent by turbolinks
+    // More details in README
+    var footer = document.getElementById("footerWrap");
+		footer ? footer.appendChild(iframe) : document.body.appendChild(iframe);
 	}
 
 	function init(conf){
