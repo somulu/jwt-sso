@@ -7,6 +7,7 @@ var accountId;
 var tokenId;
 var apiKey;
 var domain;
+var redirectRequired;
 var safariCookie = '__c2FmYXJpVmVyaWZpY2F0aW9uVG9rZW4';
 
 // Public functions
@@ -41,6 +42,12 @@ function onLoad(){
 function noAuthFound(){
   domain = "*";
   var operation = {action: "sso.noauthfound"};
+  postMessageToListeners (operation,domain);
+}
+
+function redirectForToken() {
+  domain = "*";
+  var operation = {action: "sso.redirectforaccess"};
   postMessageToListeners (operation,domain);
 }
 
@@ -197,11 +204,24 @@ function parseJWTLocal(jwtsso){
 }
 
 function ready(){
+  // Do nothing if redirect required meta is set. Subscriber app will user parameter hash to log the user in.
+  // if(redirectRequired) {
+  //   redirectForToken();
+  //   return;
+  // }
   // Explicit cookie implementation for safari because localStorage is not accessible from remote iFrame but cookies are
   if (isSafariBrowser()) {
     var jwtsso = getCookieByName(safariCookie);
   } else {
-    var jwtsso = localStorage.getItem(tokenId);
+    // Try to fetch the localStorage
+    // If third party cookies are disabled, this would raise an error
+    // Catch the error, emit a redirect event and do nothing (assuming application is handling the redirect part)
+    try {
+      var jwtsso = localStorage.getItem(tokenId);
+    } catch (err) {
+      redirectForToken();
+      return;
+    }
   }
   if (jwtsso){
     validateJWT (jwtsso);
@@ -217,6 +237,7 @@ function init(){
   domain = getGetParam("domain");
   validationUrl = getGetParam("validationUrl");
   validate = !(getGetParam("validate") == 'false');
+  redirectRequired = (getGetParam("redirectRequired") == 'true');
   if (validate && !validationUrl)
     validationUrl = getOrigin() + '/validate';
 
@@ -226,7 +247,8 @@ function init(){
     apiKey: '',
     domain: domain,
     tokenId: 'ssls.sso.jwt.' + accountId,
-    validate: validate
+    validate: validate,
+    redirectRequired: redirectRequired
   }
   //Listener for localStorage changes of ssls.sso.jwt.[accountId] tokens
   if (window.addEventListener) {

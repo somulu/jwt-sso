@@ -113,6 +113,16 @@ function sslssso (){
 	    return null;
 	}
 
+    function _getRedirectRequired() {
+        if (config.redirectRequired){
+            return config.redirectRequired;
+        } else if (_getMeta("ssls.crossdomainredirect")){
+            return _getMeta("ssls.crossdomainredirect");
+        }
+
+        return null;
+    }
+
 	 var _getScriptURL = (function() {
 	        var scripts = document.getElementsByTagName('script');
 	        var index = scripts.length - 1;
@@ -132,6 +142,7 @@ function sslssso (){
     	var accountId = _getAccountId();
     	var validationUrl = _getValidationUrl();
     	var validate = _getValidate();
+        var redirectRequired = _getRedirectRequired();
 
     	url = url + "?domain="+origin;
     	if (accountId){
@@ -145,6 +156,11 @@ function sslssso (){
     	if (validate != null){
     		url = url + "&validate="+validate;
     	}
+
+        if (redirectRequired != null){
+            url = url + "&redirectRequired="+redirectRequired;
+        }
+
     	return url;
 	}
 
@@ -210,14 +226,16 @@ function sslssso (){
 				onIdentification(data);
 			dispatchEvent('sso.onidentification',data);
 
-		}else if (data && data.action == "sso.noauthfound") {
+		}else if (data && data.action == "sso.redirectforaccess") {
+            if (typeof(redirectForAccess) == "function")
+                redirectForAccess(data);
+            dispatchEvent('sso.redirectforaccess',data);
+        }else if (data && data.action == "sso.noauthfound") {
       if (typeof(noAuthFound) == "function")
         noAuthFound(data);
       dispatchEvent('sso.noauthfound',data);
     }
 	}
-
-
 
 	function _init(){
 
