@@ -219,7 +219,7 @@ function ready(){
     try {
       var jwtsso = localStorage.getItem(tokenId);
     } catch (err) {
-      redirectForToken();
+      // redirectForToken();
       return;
     }
   }
